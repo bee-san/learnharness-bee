@@ -186,19 +186,26 @@ export function AppearanceSection({
 
 	return (
 		<>
-			<SettingsRow label="Mode" hint="Coming soon" testid="row-mode" dimmed>
-				<ThinSelect value="dark" ariaLabel="mode" onChange={() => {}} testid="select-mode" disabled>
+			<SettingsRow label="Theme" hint="A little pink, a lot of possibility" testid="row-theme">
+				<ThinSelect value={appearance?.theme ?? "default"} ariaLabel="Theme" onChange={(value) => onSectionChange({ ...appearance, theme: value as "default" | "girlypop" })} testid="select-theme">
+					<option value="default">Classic dark</option>
+					<option value="girlypop">Girlypop ♡</option>
+				</ThinSelect>
+			</SettingsRow>
+			<SettingsRow label="Mode" hint="Set by your theme" testid="row-mode" dimmed>
+				<ThinSelect value={resolved.theme === "girlypop" ? "light" : "dark"} ariaLabel="mode" onChange={() => {}} testid="select-mode" disabled>
 					<option value="dark">Dark</option>
+					<option value="light">Light</option>
 				</ThinSelect>
 			</SettingsRow>
 			<SettingsRow
 				label="Background"
-				hint={`Empty = ${resolved.background ?? "#141414"}`}
+				hint={`Empty = ${resolved.theme === "girlypop" ? "#fff4f8" : "#141414"}`}
 				testid="row-background"
 			>
 				<CommitInput
 					value={appearance?.background ?? ""}
-					placeholder="#141414"
+					placeholder={resolved.theme === "girlypop" ? "#fff4f8" : "#141414"}
 					ariaLabel="background hex"
 					testid="input-background"
 					onCommit={(v) => onSectionChange({ ...appearance, background: v === "" ? null : v })}

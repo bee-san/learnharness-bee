@@ -277,6 +277,7 @@ export interface MdRenderingSettings {
 
 /** Appearance settings — mode, colors, type, markdown emphasis. */
 export interface AppearanceSettings {
+	theme?: "default" | "girlypop";
 	/** "dark" | "light" (default dark). */
 	mode?: "dark" | "light";
 	/** The one user-chosen color; everything else derives per-mode in code.
@@ -545,6 +546,7 @@ function sanitizeMdRendering(raw: unknown): MdRenderingSettings {
 
 function sanitizeAppearance(raw: Record<string, unknown>): AppearanceSettings {
 	const out: AppearanceSettings = {};
+	if (raw.theme === "default" || raw.theme === "girlypop") out.theme = raw.theme;
 	if (raw.mode === "dark" || raw.mode === "light") out.mode = raw.mode;
 	if (raw.background !== undefined) out.background = sanitizeHexOrNull(raw.background);
 	if (raw.fontFamily !== undefined) {

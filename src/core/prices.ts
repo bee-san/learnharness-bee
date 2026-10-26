@@ -17,6 +17,8 @@ export function isChatGPTPlan(model: string | undefined): boolean {
 	return model?.startsWith("chatgpt:") === true;
 }
 export function subscriptionLabel(model: string | undefined): string | undefined {
+	if (model?.startsWith("codex-cli:")) return "Codex CLI";
+	if (model?.startsWith("claude-cli:")) return "Claude CLI";
 	if (isChatGPTPlan(model)) return "ChatGPT";
 	return NATIVE_SUBSCRIPTIONS.find((p) => model?.startsWith(`${p.logicalId}:`))?.label;
 }

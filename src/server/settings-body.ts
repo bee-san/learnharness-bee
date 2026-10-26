@@ -213,6 +213,10 @@ export function parseAppearanceSettingsBody(body: unknown): SettingsBodyResult<A
 	const raw = asRecord(body);
 	if (!raw) return { ok: false, error: "Invalid JSON body" };
 	const settings: AppearanceSettings = {};
+	if (raw.theme !== undefined) {
+		if (raw.theme !== "default" && raw.theme !== "girlypop") return { ok: false, error: 'theme must be "default" or "girlypop"' };
+		settings.theme = raw.theme;
+	}
 	if (raw.mode !== undefined) {
 		if (raw.mode !== "dark" && raw.mode !== "light") {
 			return { ok: false, error: "mode must be \"dark\" or \"light\"" };

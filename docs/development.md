@@ -58,6 +58,34 @@ Sign-in opens a new tab in the browser that initiated it; permit that tab if you
 
 This remains a **trusted developer/shared-server mode**, not multi-user hosting. Subscription controls require same-origin JSON/custom-header requests; browser-opening actions are short-lived, origin-bound and one-use. These checks prevent ordinary cross-origin browser controls, **not user authentication or DNS-rebinding protection**. Do not expose an unprotected dev/server instance to untrusted users or the public Internet; a public deployment needs an independent access/host gate. Remote ChatGPT callback routing, per-user accounts and credential import are not implemented.
 
+## Local Whisper dictation
+
+Dictation defaults to a local Whisper service. Install [uv](https://docs.astral.sh/uv/), then start the service from this checkout:
+
+```bash
+# First run: install Python dependencies and download Whisper Small if needed.
+uv run --python 3.12 scripts/local-whisper.py --download-model
+
+# Later runs: reuse the cached model and dependencies without network access.
+uv run --offline --python 3.12 scripts/local-whisper.py
+```
+
+Leave it running alongside LearnHarness. Settings → Providers → Dictation shows its status. It listens only on `127.0.0.1:8765`, keeps the model warm, and runs CPU INT8 with four threads. `--model`, `--threads` and `--port` adjust the service; `LH_WHISPER_URL` adjusts the app's endpoint and accepts only loopback HTTP addresses.
+
+Click Dictate, speak, then stop: the recording is transcribed locally and appended to the active answer/thinking field or composer. Submit waits for transcription; Escape discards the recording. Recordings stay in memory and are limited to 15 minutes. Local mode never mints Deepgram tokens or falls back to cloud transcription. Requests remain local; Python packages and model weights need downloading only during setup.
+
+Whisper uses `language="en"` and a short British-English vocabulary prompt to prefer spellings such as *favourite*, *colour*, *organise* and *centre*. There is no separate `en-GB` acoustic model, so spelling is a preference rather than a guarantee. Silence is filtered before recognition. Set `LH_DICTATION_PROVIDER=deepgram` before starting the app to explicitly select the existing optional cloud provider instead.
+
+## Local CLI connections
+
+Settings → Providers → Local CLIs checks installed `codex` and `claude` commands and their existing subscription sign-ins. Sign in with `codex login` or `claude auth login`, then refresh that section. LearnHarness never imports their credential files. `LH_CODEX_CLI` and `LH_CLAUDE_CLI` optionally select explicit executable paths; otherwise PATH and `~/.local/bin` are searched.
+
+Choose CLI models in Settings → Agent or the session picker. Codex's live model list is intersected with Pi's capability catalog. Claude offers explicit versions from Pi's Anthropic catalog; actual account access is checked when the CLI runs. Requests use CLI subscription sign-ins without falling back to app API keys. Usage is labeled by CLI rather than priced as API dollars.
+
+`src/agent/cli-provider.ts` runs one structured-output subprocess per model step, with the application's instructions, transcript, tool declarations, and image attachments. LearnHarness validates and executes the returned application tool calls. CLI coding tools, project hooks, external MCP servers, and session persistence are disabled for these requests. Temporary request files are removed before completion; cancellation kills the subprocess group. Responses arrive when a model step completes, rather than as token deltas.
+
+Run the deterministic suite with a scratch `LH_DATA_DIR` and `LH_AUTH_FILE` while using the app: several legacy tests create fixture records through the default stores. Keep tests separate from a live learning-data directory.
+
 ## Architecture
 
 Five layers, dependency arrows pointing inward only, machine-enforced as four ESLint zones (shell → barrels only; core and agent never import below themselves). Two composition roots, one writer per store. The full spec — layers, systems, runtime flows, invariants, seams: [`docs/architecture.md`](docs/architecture.md).

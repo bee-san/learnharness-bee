@@ -102,6 +102,42 @@
 	--lh-heading-weight: 900;
 }
 
+/* Girlypop is an opt-in skin; all reading and interaction colors use the
+   same semantic tokens as the classic theme. */
+:root[data-theme="girlypop"] {
+	color-scheme: light;
+	--background: #fff4f8;
+	--foreground: #54253e;
+	--card: #fffafd;
+	--card-foreground: #54253e;
+	--popover: #fffafd;
+	--popover-foreground: #54253e;
+	--primary: #b7256b;
+	--primary-foreground: #ffffff;
+	--secondary: #fce3ee;
+	--secondary-foreground: #72274c;
+	--muted: #f9e5ef;
+	--muted-foreground: #88526c;
+	--accent: #f9d4e6;
+	--accent-foreground: #682144;
+	--destructive: #b02045;
+	--border: #e8bfd2;
+	--input: #ddb0c6;
+	--ring: #b7256b;
+	--lh-ink-strong: #a51d5c;
+	--lh-ink-italic: #8b4179;
+	--lh-mark-ring: #b7256b;
+	--lh-mark-harness: #ad628a;
+}
+
+:root[data-theme="girlypop"] body {
+	background-image: radial-gradient(ellipse at top right, #fbd8eb88, transparent 60%);
+}
+
+:root[data-theme="girlypop"] :is(.rounded-sm, .rounded-md) { border-radius: 0.625rem; }
+:root[data-theme="girlypop"] :is(.rounded-lg, .rounded-xl) { border-radius: 1.125rem; }
+:root[data-theme="girlypop"] ::selection { background: #f4b4d3; color: #54253e; }
+
 /* CMU Serif bold (titles) — bundled local file, no CDN dependency. */
 @font-face {
 	font-family: "lh-cmu";

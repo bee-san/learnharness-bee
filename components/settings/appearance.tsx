@@ -7,9 +7,9 @@
  * Why variables and not className swaps: every seam the settings touch was
  * built token-first (--font-prose, --lh-prose-size, --lh-ink-strong, …),
  * so application is setProperty and nothing re-renders. The ONE thing the
- * variables can't reach — the mode — is dark-only this wave (the light
- * palette is designed in the later design wave; <html class="dark"> is
- * static in app/layout.tsx).
+ * variables can't reach — the theme selector — is applied through the
+ * root data-theme attribute and dark class. Girlypop supplies a complete
+ * light palette; the classic theme keeps the original dark palette.
  *
  * The provider is mounted at the ROOT LAYOUT level (like ActivityProvider):
  * every page picks appearance up on load. The settings page writes a
@@ -26,6 +26,7 @@ import { FACTORY_SETTINGS, type AppearanceSettings } from "@/src/core";
 export function resolveAppearance(delta: AppearanceSettings | undefined) {
 	const f = FACTORY_SETTINGS.appearance;
 	return {
+		theme: delta?.theme ?? "default",
 		mode: delta?.mode ?? f.mode,
 		background: delta?.background ?? f.background,
 		fontFamily: delta?.fontFamily ?? f.fontFamily,
@@ -76,7 +77,7 @@ export function derivedPalette(background: string): Record<string, string> {
  *  exported for tests. */
 export function appearanceVars(a: ReturnType<typeof resolveAppearance>): Record<string, string> {
 	const vars: Record<string, string> = {};
-	if (a.background !== null) Object.assign(vars, derivedPalette(a.background));
+	if (a.background !== null) Object.assign(vars, a.theme === "girlypop" ? { "--background": a.background } : derivedPalette(a.background));
 	if (a.fontFamily !== null) {
 		vars["--font-prose"] = `"${a.fontFamily}", var(--font-sans3), ui-sans-serif, system-ui, sans-serif`;
 	}
@@ -130,6 +131,11 @@ export function AppearanceProvider({ children }: { children: React.ReactNode }) 
 	// The vars apply on every change — stringified as the change signal.
 	const vars = useMemo(() => appearanceVars(resolveAppearance(delta)), [delta]);
 	const key = useMemo(() => JSON.stringify(vars), [vars]);
+	const theme = delta?.theme ?? "default";
+	useEffect(() => {
+		document.documentElement.dataset.theme = theme;
+		document.documentElement.classList.toggle("dark", theme !== "girlypop");
+	}, [theme]);
 	// REMOVAL is half the job (owner repro, fix wave): a later write that
 	// OMITS a var (empty field = factory, serif toggle back on) must clear
 	// the previously-set inline value or the stale one wins forever —
