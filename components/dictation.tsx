@@ -246,7 +246,7 @@ export type Dictation = {
  * composer fallback; the mounted question form's claim wins while a
  * question waits.
  */
-export function useDictation({ append }: { append: (text: string) => void }): Dictation {
+export function useDictation({ append, ownTarget = false, shortcuts = true }: { append: (text: string) => void; ownTarget?: boolean; shortcuts?: boolean }): Dictation {
 	const [phase, setPhase] = useState<DictationPhase>("idle");
 	const [error, setError] = useState<string | null>(null);
 	/** Latest RMS from the worklet — the meter samples this (dictate pattern). */
@@ -289,8 +289,8 @@ export function useDictation({ append }: { append: (text: string) => void }): Di
 		if (bufferRef.current.length === 0) return;
 		const text = bufferRef.current.join(" ");
 		bufferRef.current = [];
-		(questionTarget ?? appendRef.current)(text);
-	}, []);
+		(ownTarget ? appendRef.current : questionTarget ?? appendRef.current)(text);
+	}, [ownTarget]);
 
 	/** Full teardown of one run's machinery. Idempotent; generation-guarded by callers. */
 	const cleanup = useCallback(() => {
@@ -593,13 +593,15 @@ export function useDictation({ append }: { append: (text: string) => void }): Di
 	}, []);
 	useEffect(() => () => { bufferRef.current = []; cleanup(); }, [cleanup]);
 	useEffect(() => {
+		if (!shortcuts) return;
 		window.addEventListener("lh:kbd-toggle-dictation", toggle);
 		return () => window.removeEventListener("lh:kbd-toggle-dictation", toggle);
-	}, [toggle]);
+	}, [toggle, shortcuts]);
 	useEffect(() => {
+		if (!shortcuts) return;
 		window.addEventListener("lh:kbd-cancel-dictation", cancel);
 		return () => window.removeEventListener("lh:kbd-cancel-dictation", cancel);
-	}, [cancel]);
+	}, [cancel, shortcuts]);
 
 	return {
 		phase,

@@ -2,7 +2,7 @@
 const MAX_AUDIO_BYTES = 32 * 1024 * 1024;
 
 export function whisperServiceUrl(): URL {
-	const url = new URL(process.env.LH_WHISPER_URL || "http://127.0.0.1:8765");
+	const url = new URL(process.env.LH_WHISPER_URL || "http://127.0.0.1:8780");
 	if (url.protocol !== "http:" || !["127.0.0.1", "localhost", "[::1]"].includes(url.hostname) || url.username || url.password) throw new Error("Local Whisper must use a loopback HTTP address.");
 	return url;
 }

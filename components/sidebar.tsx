@@ -6,7 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { MenuShell } from "@/components/menu-shell";
 import { DeleteSessionDialog } from "@/components/delete-session-dialog";
 import type { ChatDeleteMode } from "@/src/core";
-import { DumbbellIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, PlusIcon, SearchIcon, SettingsIcon } from "lucide-react";
+import { BookmarkPlusIcon, DumbbellIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, PlusIcon, SearchIcon, SettingsIcon } from "lucide-react";
+import { AnkiProvider } from "@/components/anki/provider";
 import { ActivitySection } from "@/components/activity-dock";
 import { CoverageMenuBlock } from "@/components/extraction-coverage";
 import { LhMark } from "@/components/lh-mark";
@@ -847,6 +848,7 @@ function SessionsSidebar() {
 					    New session — quiet, bottom-pinned, opens the centered
 					    dialog (also mod+, in the keyboard registry). */}
 					<div className="px-3 pb-3 pt-1">
+						<Link href="/anki" data-testid="anki-entry" aria-current={pathname === "/anki" ? "page" : undefined} className="mb-1 flex items-center gap-1.5 rounded-md px-2 py-2 text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"><BookmarkPlusIcon className="size-3" />Anki notebook</Link>
 						<Hint label="Settings" action="open-settings" side="right">
 							<button
 								type="button"
@@ -943,12 +945,14 @@ function SessionsSidebar() {
 export function AppShell({ children }: { children: React.ReactNode }) {
 	return (
 		<SettingsDialogProvider>
-			<SessionsSidebar />
-			<main className="min-w-0 flex-1">{children}</main>
-			{/* The single document-level keydown listener (keyboard wave A) —
-			    after the content in the tree, but it's window-level so order only
-			    matters for the events it dispatches, never for DOM priority. */}
-			<KeyboardShortcuts />
+			<AnkiProvider>
+				<SessionsSidebar />
+				<main className="min-w-0 flex-1">{children}</main>
+				{/* The single document-level keydown listener (keyboard wave A) —
+				    after the content in the tree, but it's window-level so order only
+				    matters for the events it dispatches, never for DOM priority. */}
+				<KeyboardShortcuts />
+			</AnkiProvider>
 		</SettingsDialogProvider>
 	);
 }

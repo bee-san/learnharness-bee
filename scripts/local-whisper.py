@@ -23,7 +23,7 @@ BRITISH_PROMPT = (
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--port", type=int, default=8780)
     parser.add_argument("--model", default="small")
     parser.add_argument("--threads", type=int, default=4)
     parser.add_argument("--download-model", action="store_true")

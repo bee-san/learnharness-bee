@@ -46,7 +46,7 @@ function isolated(t: { after: (fn: () => void) => void }) {
 
 test("local dictation is the default and reports English (UK) without minting cloud tokens", async (t) => {
 	isolated(t);
-	globalThis.fetch = async (url) => { assert.equal(String(url), "http://127.0.0.1:8765/health"); return Response.json({ ready: true }); };
+	globalThis.fetch = async (url) => { assert.equal(String(url), "http://127.0.0.1:8780/health"); return Response.json({ ready: true }); };
 	const response = await dictationConfiguration();
 	assert.equal(response.status, 200);
 	assert.deepEqual(await response.json(), { provider: "local-whisper", language: "en", locale: "en-GB", ready: true });
@@ -73,7 +73,7 @@ test("transcription proxies the WAV only to loopback and preserves British spell
 	let calls = 0;
 	globalThis.fetch = async (url, options) => {
 		calls++;
-		assert.equal(String(url), "http://127.0.0.1:8765/transcribe");
+		assert.equal(String(url), "http://127.0.0.1:8780/transcribe");
 		assert.equal(new Headers(options?.headers).get("X-LearnHarness-Local-Whisper"), "1");
 		assert.deepEqual(Buffer.from(options!.body as Buffer), Buffer.from(audio));
 		return Response.json({ text: "My favourite colour is blue." });
